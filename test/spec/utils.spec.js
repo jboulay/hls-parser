@@ -2,7 +2,7 @@ const test = require('ava');
 const rewire = require('rewire');
 const utils = require('../../utils');
 
-utils.setOptions({strictMode: true});
+utils.setOptions({ strictMode: true });
 
 test('utils.THROW', t => {
   try {
@@ -63,15 +63,15 @@ test('utils.toNumber', t => {
 });
 
 test('utils.hexToByteSequence', t => {
-  t.deepEqual(utils.hexToByteSequence('0x000000'), Buffer.from([0, 0, 0]));
-  t.deepEqual(utils.hexToByteSequence('0xFFFFFF'), Buffer.from([255, 255, 255]));
-  t.deepEqual(utils.hexToByteSequence('FFFFFF'), Buffer.from([255, 255, 255]));
+  t.deepEqual(utils.hexToByteSequence('0x000000'), Uint8Array.from([0, 0, 0]));
+  t.deepEqual(utils.hexToByteSequence('0xFFFFFF'), Uint8Array.from([255, 255, 255]));
+  t.deepEqual(utils.hexToByteSequence('FFFFFF'), Uint8Array.from([255, 255, 255]));
 });
 
 test('utils.byteSequenceToHex', t => {
-  t.is(utils.byteSequenceToHex(Buffer.from([0, 0, 0])), '0x000000');
-  t.is(utils.byteSequenceToHex(Buffer.from([255, 255, 255])), '0xFFFFFF');
-  t.is(utils.byteSequenceToHex(Buffer.from([255, 255, 256])), '0xFFFF00');
+  t.is(utils.byteSequenceToHex(Uint8Array.from([0, 0, 0])), '0x000000');
+  t.is(utils.byteSequenceToHex(Uint8Array.from([255, 255, 255])), '0xFFFFFF');
+  t.is(utils.byteSequenceToHex(Uint8Array.from([255, 255, 256])), '0xFFFF00');
 });
 
 test('utils.tryCatch', t => {
@@ -143,7 +143,7 @@ test('utils.formatDate', t => {
 });
 
 test('utils.setOptions/getOptions', t => {
-  const params = {a: 1, b: 'b', c: [1, 2, 3], strictMode: true};
+  const params = { a: 1, b: 'b', c: [1, 2, 3], strictMode: true };
   utils.setOptions(params);
   t.deepEqual(params, utils.getOptions());
   params.strictMode = false;
@@ -153,15 +153,15 @@ test('utils.setOptions/getOptions', t => {
 
 test('utils.THROW.strictMode', t => {
   const message = 'Error Message';
-  utils.setOptions({strictMode: false});
+  utils.setOptions({ strictMode: false });
   try {
-    utils.THROW({message});
+    utils.THROW({ message });
   } catch {
     t.fail();
   }
-  utils.setOptions({strictMode: true});
+  utils.setOptions({ strictMode: true });
   try {
-    utils.THROW({message});
+    utils.THROW({ message });
     t.fail();
   } catch (e) {
     t.is(e.message, message);
@@ -186,11 +186,11 @@ test('utils.THROW.silent', t => {
     }
   });
   const message = 'Error Message';
-  utils.setOptions({strictMode: false});
-  utils.THROW({message});
+  utils.setOptions({ strictMode: false });
+  utils.THROW({ message });
   silent = true;
-  utils.setOptions({silent});
-  utils.THROW({message});
+  utils.setOptions({ silent });
+  utils.THROW({ message });
   console.error('end');
-  utils.setOptions({strictMode: true});
+  utils.setOptions({ strictMode: true });
 });

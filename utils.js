@@ -71,7 +71,7 @@ function hexToByteSequence(str) {
   for (let i = 0; i < str.length; i += 2) {
     numArray.push(toNumber(str.slice(i, i + 2), 16));
   }
-  return Buffer.from(numArray);
+  return Uint8Array.from(numArray);
 }
 
 function byteSequenceToHex(sequence, start = 0, end = sequence.length) {

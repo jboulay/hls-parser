@@ -70,17 +70,17 @@ function getTagCategory(tagName) {
 
 function parseEXTINF(param) {
   const pair = utils.splitAt(param, ',');
-  return {duration: utils.toNumber(pair[0]), title: decodeURIComponent(escape(pair[1]))};
+  return { duration: utils.toNumber(pair[0]), title: decodeURIComponent(escape(pair[1])) };
 }
 
 function parseBYTERANGE(param) {
   const pair = utils.splitAt(param, '@');
-  return {length: utils.toNumber(pair[0]), offset: pair[1] ? utils.toNumber(pair[1]) : -1};
+  return { length: utils.toNumber(pair[0]), offset: pair[1] ? utils.toNumber(pair[1]) : -1 };
 }
 
 function parseResolution(str) {
   const pair = utils.splitAt(str, 'x');
-  return {width: utils.toNumber(pair[0]), height: utils.toNumber(pair[1])};
+  return { width: utils.toNumber(pair[0]), height: utils.toNumber(pair[1]) };
 }
 
 function parseAllowedCpc(str) {
@@ -96,7 +96,7 @@ function parseAllowedCpc(str) {
       utils.INVALIDPLAYLIST(message);
       continue;
     }
-    allowedCpcList.push({format, cpcList: cpcText.split('/')});
+    allowedCpcList.push({ format, cpcList: cpcText.split('/') });
   }
   return allowedCpcList;
 }
@@ -260,7 +260,7 @@ function splitTag(line) {
   return [line.slice(1, index).trim(), line.slice(index + 1).trim()];
 }
 
-function parseRendition({attributes}) {
+function parseRendition({ attributes }) {
   const rendition = new Rendition({
     type: attributes['TYPE'],
     uri: attributes['URI'],
@@ -342,7 +342,7 @@ function parseVariant(lines, variantAttrs, uri, iFrameOnly, params) {
       if (variantAttrs[renditionType] === renditionAttrs['GROUP-ID']) {
         addRendition(variant, line, renditionType);
         if (renditionType === 'CLOSED-CAPTIONS') {
-          for (const {instreamId} of variant.closedCaptions) {
+          for (const { instreamId } of variant.closedCaptions) {
             if (instreamId && instreamId.startsWith('SERVICE') && params.compatibleVersion < 7) {
               params.compatibleVersion = 7;
               break;
@@ -391,7 +391,7 @@ function sameKey(key1, key2) {
 function parseMasterPlaylist(lines, params) {
   const playlist = new MasterPlaylist();
   let variantIsScored = false;
-  for (const [index, {name, value, attributes}] of lines.entries()) {
+  for (const [index, { name, value, attributes }] of lines.entries()) {
     if (name === 'EXT-X-VERSION') {
       playlist.version = value;
     } else if (name === 'EXT-X-STREAM-INF') {
@@ -453,7 +453,7 @@ function parseMasterPlaylist(lines, params) {
       if (typeof attributes['TIME-OFFSET'] !== 'number') {
         utils.INVALIDPLAYLIST('EXT-X-START: TIME-OFFSET attribute is REQUIRED');
       }
-      playlist.start = {offset: attributes['TIME-OFFSET'], precise: attributes['PRECISE'] || false};
+      playlist.start = { offset: attributes['TIME-OFFSET'], precise: attributes['PRECISE'] || false };
     }
   }
   if (variantIsScored) {
@@ -474,11 +474,11 @@ function parseMasterPlaylist(lines, params) {
 }
 
 function parseSegment(lines, uri, start, end, mediaSequenceNumber, discontinuitySequence, params) {
-  const segment = new Segment({uri, mediaSequenceNumber, discontinuitySequence});
+  const segment = new Segment({ uri, mediaSequenceNumber, discontinuitySequence });
   let mapHint = false;
   let partHint = false;
   for (let i = start; i <= end; i++) {
-    const {name, value, attributes} = lines[i];
+    const { name, value, attributes } = lines[i];
     if (name === 'EXTINF') {
       if (!Number.isInteger(value.duration) && params.compatibleVersion < 3) {
         params.compatibleVersion = 3;
@@ -577,7 +577,7 @@ function parseSegment(lines, uri, start, end, mediaSequenceNumber, discontinuity
       segment.map = new MediaInitializationSection({
         hint: true,
         uri: attributes['URI'],
-        byterange: {length: attributes['BYTERANGE-LENGTH'], offset: attributes['BYTERANGE-START'] || 0}
+        byterange: { length: attributes['BYTERANGE-LENGTH'], offset: attributes['BYTERANGE-START'] || 0 }
       });
     } else if (name === 'EXT-X-PART' || (name === 'EXT-X-PRELOAD-HINT' && attributes['TYPE'] === 'PART')) {
       if (name === 'EXT-X-PART' && !attributes['DURATION']) {
@@ -589,7 +589,7 @@ function parseSegment(lines, uri, start, end, mediaSequenceNumber, discontinuity
       const partialSegment = new PartialSegment({
         hint: (name === 'EXT-X-PRELOAD-HINT'),
         uri: attributes['URI'],
-        byterange: (name === 'EXT-X-PART' ? attributes['BYTERANGE'] : {length: attributes['BYTERANGE-LENGTH'], offset: attributes['BYTERANGE-START'] || 0}),
+        byterange: (name === 'EXT-X-PART' ? attributes['BYTERANGE'] : { length: attributes['BYTERANGE-LENGTH'], offset: attributes['BYTERANGE-START'] || 0 }),
         duration: attributes['DURATION'],
         independent: attributes['INDEPENDENT'],
         gap: attributes['GAP']
@@ -601,9 +601,9 @@ function parseSegment(lines, uri, start, end, mediaSequenceNumber, discontinuity
 }
 
 function parsePrefetchSegment(lines, uri, start, end, mediaSequenceNumber, discontinuitySequence, params) {
-  const segment = new PrefetchSegment({uri, mediaSequenceNumber, discontinuitySequence});
+  const segment = new PrefetchSegment({ uri, mediaSequenceNumber, discontinuitySequence });
   for (let i = start; i <= end; i++) {
-    const {name, attributes} = lines[i];
+    const { name, attributes } = lines[i];
     if (name === 'EXTINF') {
       utils.INVALIDPLAYLIST('A prefetch segment must not be advertised with an EXTINF tag.');
     } else if (name === 'EXT-X-DISCONTINUITY') {
@@ -637,7 +637,7 @@ function parseMediaPlaylist(lines, params) {
   let currentMap = null;
   let containsParts = false;
   for (const [index, line] of lines.entries()) {
-    const {name, value, attributes, category} = line;
+    const { name, value, attributes, category } = line;
     if (category === 'Segment') {
       if (segmentStart === -1) {
         segmentStart = index;
@@ -689,7 +689,7 @@ function parseMediaPlaylist(lines, params) {
       if (typeof attributes['TIME-OFFSET'] !== 'number') {
         utils.INVALIDPLAYLIST('EXT-X-START: TIME-OFFSET attribute is REQUIRED');
       }
-      playlist.start = {offset: attributes['TIME-OFFSET'], precise: attributes['PRECISE'] || false};
+      playlist.start = { offset: attributes['TIME-OFFSET'], precise: attributes['PRECISE'] || false };
     } else if (name === 'EXT-X-SERVER-CONTROL') {
       if (!attributes['CAN-BLOCK-RELOAD']) {
         utils.INVALIDPLAYLIST('EXT-X-SERVER-CONTROL: CAN-BLOCK-RELOAD=YES is mandatory for Low-Latency HLS');
@@ -766,7 +766,7 @@ function parseMediaPlaylist(lines, params) {
   if (segmentStart !== -1) {
     const segment = parseSegment(lines, '', segmentStart, lines.length - 1, mediaSequence++, discontinuitySequence, params);
     if (segment) {
-      const {parts} = segment;
+      const { parts } = segment;
       if (parts.length > 0 && !playlist.endlist && !parts[parts.length - 1].hint) {
         utils.INVALIDPLAYLIST('If the Playlist contains EXT-X-PART tags and does not contain an EXT-X-ENDLIST tag, the Playlist must contain an EXT-X-PRELOAD-HINT tag with a TYPE=PART attribute');
       }
@@ -784,7 +784,7 @@ function parseMediaPlaylist(lines, params) {
 }
 
 function addSegment(playlist, segment, discontinuitySequence, currentKey, currentMap) {
-  const {discontinuity, key, map, byterange, uri} = segment;
+  const { discontinuity, key, map, byterange, uri } = segment;
   if (discontinuity) {
     segment.discontinuitySequence = discontinuitySequence + 1;
   }
@@ -795,7 +795,7 @@ function addSegment(playlist, segment, discontinuitySequence, currentKey, curren
     segment.map = currentMap;
   }
   if (byterange && byterange.offset === -1) {
-    const {segments} = playlist;
+    const { segments } = playlist;
     if (segments.length > 0) {
       const prevSegment = segments[segments.length - 1];
       if (prevSegment.byterange && prevSegment.uri === uri) {
@@ -817,7 +817,7 @@ function checkDateRange(segments) {
   let hasDateRange = false;
   let hasProgramDateTime = false;
   for (let i = segments.length - 1; i >= 0; i--) {
-    const {programDateTime, dateRange} = segments[i];
+    const { programDateTime, dateRange } = segments[i];
     if (programDateTime) {
       hasProgramDateTime = true;
     }
@@ -845,9 +845,9 @@ function checkDateRange(segments) {
             utils.INVALIDPLAYLIST('DATERANGE tags with the same CLASS should not overlap');
           }
         }
-        range.push({start, end});
+        range.push({ start, end });
       } else {
-        rangeList.set(dateRange.classId, [{start, end}]);
+        rangeList.set(dateRange.classId, [{ start, end }]);
       }
     }
   }
@@ -856,8 +856,8 @@ function checkDateRange(segments) {
   }
 }
 
-function checkLowLatencyCompatibility({lowLatencyCompatibility, targetDuration, partTargetDuration, segments, renditionReports}, containsParts) {
-  const {canSkipUntil, holdBack, partHoldBack} = lowLatencyCompatibility;
+function checkLowLatencyCompatibility({ lowLatencyCompatibility, targetDuration, partTargetDuration, segments, renditionReports }, containsParts) {
+  const { canSkipUntil, holdBack, partHoldBack } = lowLatencyCompatibility;
   if (canSkipUntil < targetDuration * 6) {
     utils.INVALIDPLAYLIST('The Skip Boundary must be at least six times the EXT-X-TARGETDURATION.');
   }
@@ -875,11 +875,11 @@ function checkLowLatencyCompatibility({lowLatencyCompatibility, targetDuration, 
     if (partHoldBack < partTargetDuration) {
       utils.INVALIDPLAYLIST('PART-HOLD-BACK must be at least PART-TARGET');
     }
-    for (const [segmentIndex, {parts}] of segments.entries()) {
+    for (const [segmentIndex, { parts }] of segments.entries()) {
       if (parts.length > 0 && segmentIndex < segments.length - 3) {
         utils.INVALIDPLAYLIST('Remove EXT-X-PART tags from the Playlist after they are greater than three target durations from the end of the Playlist.');
       }
-      for (const [partIndex, {duration}] of parts.entries()) {
+      for (const [partIndex, { duration }] of parts.entries()) {
         if (duration === undefined) {
           continue;
         }
@@ -940,7 +940,7 @@ function parseTag(line, params) {
     params.hash[name] = true;
   }
   const [value, attributes] = parseTagParam(name, param);
-  return {name, category, value, attributes};
+  return { name, category, value, attributes };
 }
 
 function lexicalParse(text, params) {
@@ -949,7 +949,7 @@ function lexicalParse(text, params) {
     // V8 has garbage collection issues when cleaning up substrings split from strings greater
     // than 13 characters so before we continue we need to safely copy over each line so that it
     // doesn't hold any reference to the containing string.
-    const line = Buffer.from(l.trim()).toString();
+    const line = (' ' + l.trim()).slice(1);
     if (!line) {
       // empty line
       continue;
